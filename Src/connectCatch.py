@@ -1,9 +1,8 @@
-# we implement here wininng and lose and draw condition and how claculate the score 
-
+# we implement here winning and lose and draw condition and how to calculate the score
 # test can be by convolution but not thought of exact way yet
 
 def test_down(start_position, search_radius, board, player_piece): 
-    # we walk in single direction and check if we have enough consective pieces of same color 
+    # we walk in single direction and check if we have enough consecutive pieces of same color
     # as not return back in the main loop when check all directions go one direction no cycles or cacl cell many times
     # radius means edge number 
     start_row, column = start_position
@@ -82,7 +81,7 @@ def test_winning_condition(start_position, search_radius, board, player_piece):
 
     return count
 
-def calculate_score(board, player_piece, search_radius=4): # go brute force but because the original ones is one direction so not calc cell may times
+def calculate_score(board, player_piece, search_radius=4): # go brute force but because the original ones is one direction so not calc cell may time
     score = 0
 
     for row in range(len(board)):
@@ -93,7 +92,7 @@ def calculate_score(board, player_piece, search_radius=4): # go brute force but 
     return score
 
 def test_board_full(board):
-    # column is full when its top cell is filled for afirst row only
+    # column is full when its top cell is filled for a first row only
     for cell in board[0]:
         if cell == 0:  # 0 represents an empty cell
             return False
@@ -102,7 +101,7 @@ def test_board_full(board):
 
 def test_draw_condition(search_radius, board, first_player_piece, second_player_piece):
     # draw needs both, the board is full and the scores are equal
-    # equal scores alone is not enough, it is 0 to 0 at the start of the game
+    # scores alone is not enough, it is 0 to 0 at the start of the game
     if not test_board_full(board):
         return False
 
