@@ -4,7 +4,7 @@ import numpy as np
 from Src.connectCatch import result
 from constnats import PIECE, FULL_BOARD_CELL
 from GUI import get_gui_setup, get_gui_input
-from Alpha_Beta_Pruning import get_move as ai_choose_column
+from Alpha_Beta_Pruning import get_move as ai_choose
 
 def is_full(empty_cols: np.ndarray):
     return np.all(empty_cols == FULL_BOARD_CELL)
@@ -26,6 +26,11 @@ def get_opponent_piece(player_piece: PIECE):
 
 def check_winner(board: np.ndarray, player_piece: PIECE):
     return result(board, player_piece, get_opponent_piece(player_piece))
+
+def ai_choose_column(current_player, board, limit): # find the row and col that changed from whole board
+    board_copy = ai_choose(board, current_player, limit)
+    col = np.where(board != board_copy)[1][0]  # get only col index where changes
+    return col
 
 def get_move(current_player, player_color, limit, board, empty_cols):
     if current_player == player_color:
