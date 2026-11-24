@@ -1,7 +1,7 @@
 # here we define the game loops and how turned
 
 import numpy as np
-from Src.connectCatch import result
+from connectCatch import result
 from constnats import PIECE, FULL_BOARD_CELL
 from GUI import get_gui_setup, get_gui_input
 from Alpha_Beta_Pruning import get_move as ai_choose
@@ -32,7 +32,7 @@ def ai_choose_column(current_player, board, limit): # find the row and col that 
     col = np.where(board != board_copy)[1][0]  # get only col index where changes
     return col
 
-def get_move(current_player, player_color, limit, board, empty_cols):
+def get_move(current_player, player_color, limit, board):
     if current_player == player_color:
         return get_gui_input()
     return ai_choose_column(current_player, board, limit)
@@ -45,7 +45,7 @@ def main_game_loop():
     current_player = PIECE.RED_PLAYER
 
     while not is_full(empty_cols):
-        while not put_piece(board, empty_cols, get_move(current_player, player_color, limit), current_player):
+        while not put_piece(board, empty_cols, get_move(current_player, player_color, limit, board), current_player):
             pass  # Wait for valid input
         current_player = get_opponent_piece(current_player)
 
