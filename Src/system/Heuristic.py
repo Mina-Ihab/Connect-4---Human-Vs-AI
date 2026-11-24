@@ -1,7 +1,6 @@
-# here we try to get best heurestic possible (didnt search but best i know number of consecteve same color)
-from Src.connectCatch import calculate_score
-from Src.constnats import WIN_RADIUS
-from Src.GameEngine import get_opponent_piece
+# here we try to get best heuristic possible (didnt search but best i know number of consecutive same color)
+from system.connectCatch import calculate_score
+from system.constants import WIN_RADIUS, get_opponent_piece
 
 def player_heuristic(board, player_piece):
     score = 0
