@@ -1,5 +1,6 @@
 # we implement here winning and lose and draw condition and how to calculate the score
 # test can be by convolution but not thought of exact way yet
+from constnats import RESULT, WIN_RADIUS
 
 def test_down(start_position, search_radius, board, player_piece): 
     # we walk in single direction and check if we have enough consecutive pieces of same color
@@ -81,7 +82,7 @@ def test_winning_condition(start_position, search_radius, board, player_piece):
 
     return count
 
-def calculate_score(board, player_piece, search_radius=4): # go brute force but because the original ones is one direction so not calc cell may time
+def calculate_score(board, player_piece, search_radius=WIN_RADIUS): # go brute force but because the original ones is one direction so not calc cell may times
     score = 0
 
     for row in range(len(board)):
@@ -91,24 +92,14 @@ def calculate_score(board, player_piece, search_radius=4): # go brute force but 
 
     return score
 
-def test_board_full(board):
-    # column is full when its top cell is filled for a first row only
-    for cell in board[0]:
-        if cell == 0:  # 0 represents an empty cell
-            return False
+def result(board, player, ai, search_radius= WIN_RADIUS):
+    # the scores are equal
+    # equal scores alone is not enough, it is 0 to 0 at the start of the game
 
-    return True
+    first_score = calculate_score(board, player, search_radius)
+    second_score = calculate_score(board, ai, search_radius)
 
-def test_draw_condition(search_radius, board, first_player_piece, second_player_piece):
-    # draw needs both, the board is full and the scores are equal
-    # scores alone is not enough, it is 0 to 0 at the start of the game
-    if not test_board_full(board):
-        return False
+    if first_score == second_score:
+        return RESULT.DRAW
 
-    first_score = calculate_score(board, first_player_piece, search_radius)
-    second_score = calculate_score(board, second_player_piece, search_radius)
-
-    if first_score != second_score:
-        return False
-
-    return True
+    return RESULT.WIN if first_score > second_score else RESULT.LOSE 
