@@ -49,8 +49,6 @@ def maximize(alpha : float, beta : float, depth : int, current_color : int, play
         return current_board, node.value
 
     if depth == k:
-        ai_color = PIECE.RED_PLAYER if player_color == PIECE.YELLOW_PLAYER else PIECE.YELLOW_PLAYER
-
         node.value = evaluate_board(current_board, current_color)
         return current_board, node.value
 
@@ -101,8 +99,6 @@ def minimize(alpha : float, beta : float, depth : int, current_color : int, play
         return current_board, node.value
 
     if depth == k:
-        ai_color = PIECE.RED_PLAYER if player_color == PIECE.YELLOW_PLAYER else PIECE.YELLOW_PLAYER
-
         node.value = evaluate_board(current_board, current_color)
         return current_board, node.value
 
