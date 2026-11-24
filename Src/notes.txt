@@ -1,0 +1,4 @@
+# FIXME: the alpha beta curr player change to player only (alpha.py and heurestic.py)
+# SORRY: found that get opponent piece is not needed in heurestic that caused import erorr cycle
+# TODO: heurestic convolution to add in gui (from heurestic.py)
+# NOTE: game engine main loop i feel reduntuncy but didnt edit to not break gui again

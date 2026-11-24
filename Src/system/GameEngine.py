@@ -39,7 +39,7 @@ def get_move(current_player, player_color, board, limit):
     return ai_choose_column(current_player, board, limit)  # limit can be adjusted for AI difficulty
 
 def main_game_loop():
-    length, width, limit,player_color = get_gui_setup()
+    length, width, limit, player_color = get_gui_setup()
     board = np.full((length, width), PIECE.EMPTY_CELL, dtype=int)
     empty_cols = np.full(width, length-1, dtype=int)
 

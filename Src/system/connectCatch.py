@@ -1,5 +1,5 @@
 # we implement here winning and lose and draw condition and how to calculate the score
-# test can be by convolution but not thought of exact way yet
+
 from system.constants import RESULT, WIN_RADIUS
 
 def test_down(start_position, search_radius, board, player_piece): 
