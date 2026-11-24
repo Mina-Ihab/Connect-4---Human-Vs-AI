@@ -1,7 +1,7 @@
 # we implement here wininng and lose and draw condition and how claculate the score 
 
 # test can be by convolution but not thought of exact way yet
-from constnats import RESULT, WIN_RADIUS
+from Src.constnats import RESULT, WIN_RADIUS
 
 def test_down(start_position, search_radius, board, player_piece): 
     # we walk in single direction and check if we have enough consective pieces of same color 
