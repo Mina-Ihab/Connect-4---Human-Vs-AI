@@ -1,0 +1,1 @@
+# here we try to get best heurestic possible (didnt search but best i know number of consecteve same color)
