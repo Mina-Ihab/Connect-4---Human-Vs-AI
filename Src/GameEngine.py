@@ -1,10 +1,10 @@
 # here we define the game loops and how turned
 
 import numpy as np
-from connectCatch import result
-from constnats import PIECE, FULL_BOARD_CELL
-from GUI import get_gui_setup, get_gui_input
-from Alpha_Beta_Pruning import get_move as ai_choose
+from Src.connectCatch import result
+from Src.constnats import PIECE, FULL_BOARD_CELL
+from GUI.GUI import get_gui_setup, get_gui_input, gui_show_board, gui_game_over
+from Src.Alpha_Beta_Pruning import get_move as ai_choose
 
 def is_full(empty_cols: np.ndarray):
     return np.all(empty_cols == FULL_BOARD_CELL)
@@ -28,25 +28,26 @@ def check_winner(board: np.ndarray, player_piece: PIECE):
     return result(board, player_piece, get_opponent_piece(player_piece))
 
 def ai_choose_column(current_player, board, limit): # find the row and col that changed from whole board
-    board_copy = ai_choose(board, current_player, limit)
+    board_copy, value = ai_choose(board, current_player, limit)
     col = np.where(board != board_copy)[1][0]  # get only col index where changes
     return col
 
-def get_move(current_player, player_color, limit, board):
+def get_move(current_player, player_color, board, limit):
     if current_player == player_color:
         return get_gui_input()
-    return ai_choose_column(current_player, board, limit)
+    return ai_choose_column(current_player, board, limit)  # limit can be adjusted for AI difficulty
 
 def main_game_loop():
-    length, width, limit, player_color = get_gui_setup()
+    length, width, limit,player_color = get_gui_setup()
     board = np.full((length, width), PIECE.EMPTY_CELL, dtype=int)
     empty_cols = np.full(width, length-1, dtype=int)
 
     current_player = PIECE.RED_PLAYER
 
     while not is_full(empty_cols):
-        while not put_piece(board, empty_cols, get_move(current_player, player_color, limit, board), current_player):
+        while not put_piece(board, empty_cols, get_move(current_player, player_color, limit,board), current_player):
             pass  # Wait for valid input
         current_player = get_opponent_piece(current_player)
-
+        gui_show_board(board)
+    gui_game_over(check_winner(board, player_color), board)
     return check_winner(board, player_color)
