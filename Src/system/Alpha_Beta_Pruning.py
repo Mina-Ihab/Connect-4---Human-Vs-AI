@@ -27,7 +27,7 @@ def expand_board(player_turn : int, current_board : np.ndarray) -> list:
 
 # Check whether the current board contain empty position (not full board)
 def terminal_board(current_board : np.ndarray) -> bool:
-    return not (current_board.__contains__(PIECE.EMPTY_CELL))
+    return not (current_board[0] == PIECE.EMPTY_CELL).any()
 
 # Return the best move from the point of view of minimax alpha beta tree
 def get_move(current_turn : int, current_board : np.ndarray, k : int, heuristic) -> tuple:
@@ -84,6 +84,7 @@ def maximize(alpha : float, beta : float, depth : int, current_color : int, play
             node.pruned_count = len(children_list) - (i + 1)
             node.value = max_value
             node.pruned_moves = [(b, col, depth + 1) for b, col in children_list[i + 1:]]
+
             return max_move, max_value
 
     node.value = max_value
@@ -134,6 +135,7 @@ def minimize(alpha : float, beta : float, depth : int, current_color : int, play
             node.pruned_count = len(children_list) - (i + 1)
             node.value = min_value
             node.pruned_moves = [(b, col, depth + 1) for b, col in children_list[i + 1:]]
+            
             return min_move, min_value
 
     node.value = min_value

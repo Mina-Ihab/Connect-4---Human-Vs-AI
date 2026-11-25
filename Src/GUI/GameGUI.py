@@ -1,6 +1,7 @@
 import sys
 import math
-
+import threading
+from PySide6.QtCore import Qt, Signal, Slot, QObject, QEventLoop, QRectF
 import numpy as np
 from PySide6.QtCore import Qt, Signal, QEventLoop, QRectF
 from PySide6.QtGui import QPainter, QBrush, QColor, QFont
@@ -394,6 +395,53 @@ def gui_game_over(result, board):
 
     QMessageBox.information(_window, "Game Over", message)
 
+# bridge object lives in the main thread, so a signal emitted from the worker
+# thread is delivered here through the Qt event loop (thread-safe)
+class _ThreadBridge(QObject):
+    done = Signal(object, object)   # (result, error)
+
+    def __init__(self, loop):
+        super().__init__()
+        self.loop = loop
+        self.result = None
+        self.error = None
+        self.finished = False
+        self.done.connect(self._on_done)
+
+    @Slot(object, object)
+    def _on_done(self, result, error):
+        self.result = result
+        self.error = error
+        self.finished = True
+        self.loop.quit()
+
+
+# run func(*args) on another thread, keep the GUI responsive meanwhile,
+# and return its result (or re-raise its exception) in the main thread
+def gui_run_in_background(func, *args):
+    loop = QEventLoop()
+    bridge = _ThreadBridge(loop)
+
+    def worker():
+        try:
+            bridge.done.emit(func(*args), None)
+        except BaseException as e:
+            bridge.done.emit(None, e)
+
+    # daemon=True so a closed window doesn't wait for a long search
+    threading.Thread(target=worker, daemon=True).start()
+
+    _window.closed.connect(loop.quit)
+    loop.exec()
+    _window.closed.disconnect(loop.quit)
+
+    # loop ended without a result => the window was closed
+    if not bridge.finished:
+        sys.exit(0)
+
+    if bridge.error is not None:
+        raise bridge.error
+    return bridge.result
 
 # open the minimax tree of the last AI move in a new window
 def gui_show_tree(root):

@@ -4,9 +4,10 @@ import time
 import numpy as np
 from system.connectCatch import result, calculate_score
 from system.constants import PIECE, FULL_BOARD_CELL, get_opponent_piece
-from GUI.GameGUI import get_gui_setup, get_gui_input, gui_show_board, gui_game_over, gui_set_tree, gui_set_stats, gui_set_scores, gui_set_thinking, gui_set_time
+from GUI.GameGUI import (get_gui_setup, get_gui_input, gui_show_board, gui_game_over,
+                         gui_set_tree, gui_set_stats, gui_set_scores, gui_set_thinking,
+                         gui_set_time, gui_run_in_background)
 from system.Alpha_Beta_Pruning import get_move as ai_choose
-
 def is_full(empty_cols: np.ndarray):
     return np.all(empty_cols == FULL_BOARD_CELL)
 
@@ -31,7 +32,7 @@ def ai_choose_column(current_player, board, limit, heuristic): # find the row an
 def get_move(current_player, player_color, board, limit, heuristic):
     if current_player == player_color:
         return get_gui_input()
-    return ai_choose_column(current_player, board, limit, heuristic)  # limit can be adjusted for AI difficulty
+    return gui_run_in_background(ai_choose_column, current_player, board.copy(), limit, heuristic) # limit can be adjusted for AI difficulty
 
 def main_game_loop():
     length, width, limit, player_color, heuristic = get_gui_setup()
