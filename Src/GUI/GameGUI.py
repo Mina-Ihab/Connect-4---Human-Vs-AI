@@ -1,4 +1,5 @@
 import sys
+import math
 
 import numpy as np
 from PySide6.QtCore import Qt, Signal, QEventLoop, QRectF
@@ -6,10 +7,11 @@ from PySide6.QtGui import QPainter, QBrush, QColor, QFont
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QDialog, QWidget, QVBoxLayout, QHBoxLayout,
     QFormLayout, QLabel, QRadioButton, QSpinBox, QPushButton, QMessageBox,
-    QButtonGroup,
+    QButtonGroup, QComboBox,
 )
 
 from system.constants import PIECE, RESULT
+from system.Heuristic import HEURISTICS
 from GUI.MinimaxTreeGUI import MinimaxTreeView
 
 # colors, same ones as the tree view
@@ -101,6 +103,11 @@ class SetupDialog(QDialog):
         self.cols_spin.setValue(7)
         form.addRow("Columns:", self.cols_spin)
 
+        # which heuristic the AI uses
+        self.heuristic_combo = QComboBox()
+        self.heuristic_combo.addItems(list(HEURISTICS.keys()))
+        form.addRow("Heuristic:", self.heuristic_combo)
+
         layout.addLayout(form)
 
         hint = QLabel("Higher depth makes the AI stronger but slower.")
@@ -110,6 +117,9 @@ class SetupDialog(QDialog):
         start = QPushButton("Start Game")
         start.clicked.connect(self.accept)
         layout.addWidget(start)
+
+    def heuristic_name(self):
+        return self.heuristic_combo.currentText()
 
     def values(self):
         color = PIECE.RED_PLAYER if self.red_radio.isChecked() else PIECE.YELLOW_PLAYER
@@ -258,6 +268,10 @@ class GameWindow(QMainWindow):
         self.stats_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.stats_label)
 
+        self.time_label = QLabel("AI thinking time: -")
+        self.time_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.time_label)
+
         # the button stays disabled until the AI has made a move (no tree before that)
         self.last_root = None
         self.tree_button = QPushButton("Visualize Minimax Tree")
@@ -288,13 +302,14 @@ def get_gui_setup():
         sys.exit(0)
 
     length, width, limit, player_color = dialog.values()
+    heuristic = HEURISTICS[dialog.heuristic_name()]
     _player_color = player_color
 
     _window = GameWindow(length, width, limit, player_color)
     _window.show()
     _app.processEvents()
 
-    return length, width, limit, player_color
+    return length, width, limit, player_color, heuristic
 
 
 # wait here until the player clicks a column, then return that column
@@ -337,6 +352,22 @@ def gui_set_stats(value, expanded_nodes):
 
 def gui_set_scores(player_score, ai_score):
     _window.score_label.setText(f"Score  -  You: {player_score}   |   AI: {ai_score}")
+
+
+# called when the AI starts thinking: the tree button is disabled until it finishes
+def gui_set_thinking():
+    _window.tree_button.setEnabled(False)
+    _window.time_label.setText("AI thinking time: ...")
+    _window.set_status("AI is thinking...")
+    _app.processEvents()
+
+
+# called when the AI finishes: show how long it took (in milliseconds)
+def gui_set_time(seconds):
+    # round to 4 significant figures (and never use scientific notation like 1e+04)
+    ms = float(f"{seconds * 1000:.4g}")
+    decimals = max(0, 3 - math.floor(math.log10(ms))) if ms > 0 else 0
+    _window.time_label.setText(f"AI thinking time: {ms:.{decimals}f} ms")
 
 
 # redraw after every move

@@ -30,18 +30,17 @@ def terminal_board(current_board : np.ndarray) -> bool:
     return not (current_board.__contains__(PIECE.EMPTY_CELL))
 
 # Return the best move from the point of view of minimax alpha beta tree
-def get_move(current_turn : int, current_board : np.ndarray, k : int) -> tuple:
+def get_move(current_turn : int, current_board : np.ndarray, k : int, heuristic) -> tuple:
     expanded_nodes = [0]
 
     player_color = PIECE.RED_PLAYER if current_turn == PIECE.YELLOW_PLAYER else PIECE.YELLOW_PLAYER
 
     root = TreeNode(current_board, 0, current_turn)
-    board, value = maximize(-float("inf"), float("inf"), 0, current_turn, player_color, current_board, k, root, expanded_nodes)
-
+    board, value = maximize(-float("inf"), float("inf"), 0, current_turn, player_color, current_board, k, root, expanded_nodes, heuristic)
     return board, value, expanded_nodes[0], root
 
 # Try the get the best move to maximize the minimax value of the current board
-def maximize(alpha : float, beta : float, depth : int, current_color : int, player_color : int, current_board : np.ndarray, k : int, node : TreeNode, expanded_nodes : list) -> tuple[np.ndarray, float]:
+def maximize(alpha : float, beta : float, depth : int, current_color : int, player_color : int, current_board : np.ndarray, k : int, node : TreeNode, expanded_nodes : list, heuristic) -> tuple[np.ndarray, float]:
     if terminal_board(current_board):
         ai_color = PIECE.RED_PLAYER if player_color == PIECE.YELLOW_PLAYER else PIECE.YELLOW_PLAYER
 
@@ -49,7 +48,7 @@ def maximize(alpha : float, beta : float, depth : int, current_color : int, play
         return current_board, node.value
 
     if depth == k:
-        node.value = evaluate_board(current_board, current_color)
+        node.value = evaluate_board(current_board, player_color, heuristic)
         return current_board, node.value
 
     max_value = -float("inf")
@@ -69,7 +68,7 @@ def maximize(alpha : float, beta : float, depth : int, current_color : int, play
         )
         node.children.append(child_node)
 
-        (min_move, min_value) = minimize(alpha, beta, depth + 1, next_turn, player_color, child_board, k, child_node, expanded_nodes)
+        (min_move, min_value) = minimize(alpha, beta, depth + 1, next_turn, player_color, child_board, k, child_node, expanded_nodes, heuristic)
         child_node.value = min_value
 
         if min_value > max_value:
@@ -91,7 +90,7 @@ def maximize(alpha : float, beta : float, depth : int, current_color : int, play
     return max_move, max_value
 
 # Try the get the best move to minimize the minimax value of the current board
-def minimize(alpha : float, beta : float, depth : int, current_color : int, player_color : int, current_board : np.ndarray, k: int, node : TreeNode, expanded_nodes: list) -> tuple[np.ndarray, float]:
+def minimize(alpha : float, beta : float, depth : int, current_color : int, player_color : int, current_board : np.ndarray, k: int, node : TreeNode, expanded_nodes: list, heuristic) -> tuple[np.ndarray, float]:
     if terminal_board(current_board):
         ai_color = PIECE.RED_PLAYER if player_color == PIECE.YELLOW_PLAYER else PIECE.YELLOW_PLAYER
 
@@ -99,7 +98,7 @@ def minimize(alpha : float, beta : float, depth : int, current_color : int, play
         return current_board, node.value
 
     if depth == k:
-        node.value = evaluate_board(current_board, current_color)
+        node.value = evaluate_board(current_board, player_color, heuristic)
         return current_board, node.value
 
     min_value = float("inf")
@@ -119,7 +118,7 @@ def minimize(alpha : float, beta : float, depth : int, current_color : int, play
         )
         node.children.append(child_node)
 
-        (max_move, max_value) = maximize(alpha, beta, depth + 1, next_turn, player_color, child_board, k, child_node, expanded_nodes)
+        (max_move, max_value) = maximize(alpha, beta, depth + 1, next_turn, player_color, child_board, k, child_node, expanded_nodes, heuristic)
         child_node.value = max_value
 
         if max_value < min_value:
